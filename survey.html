@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alcohol Delivery Survey — Delhi NCR</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f0e8;
+    --surface: #fff;
+    --ink: #1a1208;
+    --muted: #7a6e5f;
+    --accent: #d4400a;
+    --accent2: #f5a623;
+    --border: #e0d8cc;
+    --selected: #d4400a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Outfit', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* noise texture */
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 999;
+  }
+
+  /* hero */
+  .hero {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 60px 24px 50px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '🍶';
+    position: absolute;
+    font-size: 300px;
+    opacity: 0.04;
+    top: -60px; right: -40px;
+    line-height: 1;
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    display: inline-block;
+    border: 1px solid rgba(245,166,35,0.5);
+    color: var(--accent2);
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 3px; text-transform: uppercase;
+    padding: 6px 16px; border-radius: 2px;
+    margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(52px, 10vw, 96px);
+    line-height: 0.95;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero p {
+    font-size: 16px; font-weight: 300;
+    color: rgba(245,240,232,0.65);
+    max-width: 440px; margin: 0 auto 28px;
+    line-height: 1.7;
+  }
+  .hero-meta {
+    display: inline-flex; align-items: center; gap: 20px;
+    font-size: 12px; color: rgba(245,240,232,0.4);
+    letter-spacing: 0.5px;
+  }
+  .hero-meta span { display: flex; align-items: center; gap: 6px; }
+
+  /* progress */
+  .progress-wrap {
+    background: var(--ink);
+    padding: 0 24px 20px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .progress-track {
+    flex: 1; height: 2px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+  .progress-label {
+    font-size: 12px; color: rgba(245,240,232,0.4);
+    font-weight: 500; white-space: nowrap;
+  }
+
+  /* form area */
+  .form-wrap {
+    max-width: 680px; margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* question block */
+  .q-block {
+    margin-bottom: 40px;
+    animation: fadeUp 0.4s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-label {
+    display: flex; align-items: flex-start; gap: 14px;
+    margin-bottom: 16px;
+  }
+  .q-num {
+    background: var(--accent);
+    color: #fff;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 15px;
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .q-text {
+    font-size: 17px; font-weight: 600;
+    line-height: 1.4; color: var(--ink);
+  }
+  .q-sub { font-size: 13px; color: var(--muted); margin-top: 4px; font-weight: 400; }
+
+  /* options */
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .opt {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    cursor: pointer;
+    transition: all 0.18s;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+  }
+  .opt::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.18s;
+  }
+  .opt:hover { border-color: var(--accent); transform: translateX(4px); }
+  .opt.selected {
+    border-color: var(--accent);
+    background: rgba(212,64,10,0.06);
+  }
+  .opt.selected::before { opacity: 0.04; }
+  .opt-radio {
+    width: 20px; height: 20px;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.18s;
+    position: relative; z-index: 1;
+  }
+  .opt.selected .opt-radio {
+    border-color: var(--accent);
+    background: var(--accent);
+  }
+  .opt.selected .opt-radio::after {
+    content: '';
+    width: 6px; height: 6px;
+    background: white; border-radius: 50%;
+  }
+  .opt-text {
+    font-size: 15px; font-weight: 500;
+    position: relative; z-index: 1;
+    transition: color 0.18s;
+  }
+  .opt.selected .opt-text { color: var(--accent); }
+
+  /* grid options (for some questions) */
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  @media(max-width: 480px) { .options-grid { grid-template-columns: 1fr; } }
+
+  /* text input */
+  .text-input {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px; font-weight: 500;
+    color: var(--ink);
+    width: 100%; outline: none;
+    transition: border-color 0.2s;
+  }
+  .text-input:focus { border-color: var(--accent); }
+  .text-input::placeholder { color: #bbb; }
+
+  /* divider */
+  .q-divider {
+    border: none;
+    border-top: 1px dashed var(--border);
+    margin: 0 0 40px;
+  }
+
+  /* age gate */
+  .age-gate {
+    background: var(--ink);
+    border-radius: 12px;
+    padding: 20px 24px;
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 40px;
+  }
+  .age-gate-icon { font-size: 28px; }
+  .age-gate-text { font-size: 13px; color: rgba(245,240,232,0.6); line-height: 1.5; }
+  .age-gate-text strong { color: var(--accent2); }
+  .age-checkbox {
+    width: 22px; height: 22px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 5px;
+    cursor: pointer; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.18s; margin-left: auto;
+  }
+  .age-checkbox.checked {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .age-checkbox.checked::after { content: '✓'; color: white; font-size: 14px; font-weight: 700; }
+
+  /* submit */
+  .submit-wrap { text-align: center; padding-top: 8px; }
+  .submit-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none; border-radius: 10px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px; letter-spacing: 2px;
+    padding: 18px 60px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex; align-items: center; gap: 12px;
+  }
+  .submit-btn:hover { background: #b83208; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(212,64,10,0.3); }
+  .submit-btn:disabled { background: #ccc; transform: none; box-shadow: none; cursor: not-allowed; }
+  .submit-note { font-size: 12px; color: var(--muted); margin-top: 14px; }
+
+  /* success screen */
+  .success-screen {
+    display: none;
+    text-align: center;
+    padding: 80px 24px;
+    max-width: 500px; margin: 0 auto;
+  }
+  .success-screen.show { display: block; }
+  .success-icon { font-size: 72px; margin-bottom: 24px; }
+  .success-screen h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px; letter-spacing: 2px;
+    color: var(--ink); margin-bottom: 16px;
+  }
+  .success-screen p { font-size: 16px; color: var(--muted); line-height: 1.7; margin-bottom: 28px; }
+  .share-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .share-btn {
+    padding: 12px 24px; border-radius: 8px;
+    font-size: 14px; font-weight: 600;
+    cursor: pointer; border: none;
+    transition: all 0.2s;
+  }
+  .share-wa { background: #25d366; color: white; }
+  .share-wa:hover { background: #1da851; }
+  .share-copy { background: var(--ink); color: white; }
+  .share-copy:hover { background: #333; }
+
+  /* response counter (bottom right) */
+  .resp-badge {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--ink); color: var(--bg);
+    border-radius: 50px;
+    padding: 10px 18px;
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    display: flex; align-items: center; gap: 8px;
+    z-index: 100;
+  }
+  .resp-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.5; transform:scale(1.4); } }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-eyebrow">2 min survey · Delhi NCR</div>
+  <h1>WOULD YOU<br>USE <span>ALCOHOL</span><br>DELIVERY?</h1>
+  <p>We're thinking of launching a home delivery service for your favourite drinks. Tell us what you think — takes 2 minutes.</p>
+  <div class="hero-meta">
+    <span>🕒 2 minutes</span>
+    <span>🔒 Anonymous</span>
+    <span>🍺 10 questions</span>
+  </div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-label" id="progressLabel">0 / 10</div>
+</div>
+
+<div id="formArea">
+<div class="form-wrap">
+
+  <!-- Age gate -->
+  <div class="age-gate" id="ageGate" onclick="toggleAge()">
+    <div class="age-gate-icon">🔞</div>
+    <div class="age-gate-text">
+      <strong>Age Confirmation Required</strong><br>
+      I confirm I am 25 years or older (Delhi legal drinking age)
+    </div>
+    <div class="age-checkbox" id="ageCheck"></div>
+  </div>
+
+  <!-- Q1 -->
+  <div class="q-block" style="animation-delay:0.05s">
+    <div class="q-label">
+      <div class="q-num">1</div>
+      <div>
+        <div class="q-text">How often do you buy alcohol in a month?</div>
+      </div>
+    </div>
+    <div class="options" id="q1">
+      <div class="opt" onclick="select('q1',this,'Never')"><div class="opt-radio"></div><div class="opt-text">Never</div></div>
+      <div class="opt" onclick="select('q1',this,'1–2 times')"><div class="opt-radio"></div><div class="opt-text">1–2 times</div></div>
+      <div class="opt" onclick="select('q1',this,'3–5 times')"><div class="opt-radio"></div><div class="opt-text">3–5 times</div></div>
+      <div class="opt" onclick="select('q1',this,'5+ times')"><div class="opt-radio"></div><div class="opt-text">5+ times a month</div></div>
+    </div>
+  </div>
+  <hr class="q-divider">
+
+  <!-- Q2 -->
+  <div class="q-block" style="animation-delay:0.1s">
+    <div class="q-label">
+      <div class="q-num">2</div>
+      <div>
+        <div class="q-text">What's your biggest pain point when buying alcohol?</div>
+        <div class="q-sub">Pick the one that annoys you most</div>
+      </div>
+    </div>
+    <div class="options" id="q2">
+      <div class="opt" onclick="select('q2',this,'Going to store is inconvenient')"><div class="opt-radio"></div><div class="opt-text">Going to the store is inconvenient</div></div>
+      <div class="opt" onclick="select('q2',this,'Long queues')"><div class="opt-radio"></div><div class="opt-text">Long queues at the shop</div></div>
+      <div class="opt" onclick="select('q2',this,'Limited stock / brands')"><div class="opt-radio"></div><div class="opt-text">Limited stock / can't find my brand</div></div>
+      <div class="opt" onclick="select('q2',this,'Timing restrictions')"><div class="opt-radio"></div><div class="opt-text">Shop closes too early</div></div>
+      <div class="opt" onclick="select('q2',this,'No pain point')"><div class="opt-radio"></div><div class="opt-text">No issue — I manage fine</div></div>
+    </div>
+  </div>
+  <hr class="q-divider">
+
+  <!-- Q3 — KEY -->
+  <div class="q-block" style="animation-delay:0.15s">
+    <div class="q-label">
+      <div class="q-num">3</div>
+      <div>
+        <div class="q-text">Would you use an alcohol home delivery app in your area?</div>
+        <div class="q-sub">⭐ This is the key question</div>
+      </div>
+    </div>
+    <div class="options" id="q3">
+      <div class="opt" onclick="select('q3',this,'Yes definitely')"><div class="opt-radio"></div><div class="opt-text">Yes, definitely! Sign me up 🙌</div></div>
+      <div class="opt" onclick="select('q3',this,'Yes maybe')"><div class="opt-radio"></div><div class="opt-text">Yes, maybe sometimes</div></div>
+      <div class="opt" onclick="select('q3',this,'Probably not')"><div class="opt-radio"></div><div class="opt-text">Probably not</div></div>
+      <div class="opt" onclick="select('q3',this,'No prefer store')"><div class="opt-radio"></div><div class="opt-text">No, I prefer going to the store</div></div>
+    </div>
+  </div>
+  <hr class="q-divider">
+
+  <!-- Q4 -->
+  <div class="q-block" style="animation-delay:0.2s">
+    <div class="q-label">
+      <div class="q-num">4</div>
+      <div>
+        <div class="q-text">Which area / sector are you in?</div>
+        <div class="q-sub">Helps us plan where to launch first</div>
+      </div>
+    </div>
+    <input class="text-input" id="q4" placeholder="e.g. Sector 29 Gurugram, Saket Delhi, Noida Sector 62…" oninput="updateProgress()">
+  </div>
+  <hr class="q-divider">
+
+  <!-- Q5 -->
+  <div class="q-block" style="animation-delay:0.25s">
+    <div class="q-label">
+      <div class="q-num">5</div>
+      <div>
+        <div class="q-text">How much do you typically spend per alcohol purchase?</div>
+      </div>
+    </div>
+    <div class="options-grid" id="q5">
+      <div class="opt" onclick="select('q5',this,'Under ₹500')"><div class="opt-radio"></div><div class="opt-text">Under ₹500</div></div>
+      <div class="opt" onclick="select('q5',this,'₹500–1,000')"><div class="opt-radio"></div><div class="opt-text">₹500–1,000</div></div>
+      <div class="opt" onclick="select('q5',this,'₹1,000–2,000')"><div class="opt-radio"></div><div class="opt-text">₹1,000–2,000</div></div>
+      <div class="opt" onclick="select('q5',this,'₹2,000+')"><div class="opt-radio"></div><div class="opt-text">₹2,000+</div></div>
+    </div>
+  </div>
+  <hr class="q-divider">
+
+  <!-- Q6 -->
+  <div class="q-block" style="animation-delay:0.3s">
+    <div class="q-label">
+      <div class="q-num">6</div>
+      <div>
+        <div class="q-text">What delivery fee would you be okay paying?</div>
+      </div>
+    </div>
+    <div class="options" id="q6">
+      <div class="opt" onclick="select('q6',this,'Free only')"><div class="opt-radio"></div><div class="opt-text">₹0 — Free only, otherwise I'll go myself</div></div>
+      <div class="opt" onclick="select('q6',this,'Up to ₹30')"><div class="opt-radio"></div><div class="opt-text">Up to ₹30</div></div>
+      <div class="opt" onclick="select('q6',this,'Up to ₹50')"><div class="opt-radio"></div><div class="opt-text">Up to ₹50</div></div>
+      <div class="opt" onclick="select('q6',this,'Up to ₹80')"><div class="opt-radio"></div><div class="opt-text">Up to ₹80</div></div>
+      <div class="opt" onclick="select('q6',this,'More than ₹80')"><div class="opt-radio"></div><div class="opt-text">More than ₹80 if it's fast & reliable</div></div>
+    </div>
+  </div>
+  <hr class="q-divider">
+
+  <!-- Q7 -->
+  <div class="q-block" style="animation-delay:0.35s">
+    <div class="q-label">
+      <div class="q-num">7</div>
+      <div>
+        <div class="q-text">How fast do you need delivery?</div>
+      </div>
+    </div>
+    <div class="options-grid" id="q7">
+      <div class="opt" onclick="select('q7',this,'Within 30 mins')"><div class="opt-radio"></div><div class="opt-text">Within 30 mins ⚡</div></div>
+      <div class="opt" onclick="select('q7',this,'Within 1 hour')"><div class="opt-radio"></div><div class="opt-text">Within 1 hour</div></div>
+      <div class="opt" onclick="select('q7',this,'Within 2 hours')"><div class="opt-radio"></div><div class="opt-text">Within 2 hours</div></div>
+      <div class="opt" onclick="select('q7',this,'Same day')"><div class="opt-radio"></div><div class="opt-text">Same day is fine</div></div>
+    </div>
+  </div>
+  <hr class="q-divider">
+
+  <!-- Q8 -->
+  <div class="q-block" style="animation-delay:0.4s">
+    <div class="q-label">
+      <div class="q-num">8</div>
+      <div>
+        <div class="q-text">What time do you usually need alcohol?</div>
+      </div>
+    </div>
+    <div class="options" id="q8">
+      <div class="opt" onclick="select('q8',this,'10AM–2PM')"><div class="opt-radio"></div><div class="opt-text">10 AM – 2 PM</div></div>
+      <div class="opt" onclick="select('q8',this,'2PM–6PM')"><div class="opt-radio"></div><div class="opt-text">2 PM – 6 PM</div></div>
+      <div class="opt" onclick="select('q8',this,'6PM–9PM')"><div class="opt-radio"></div><div class="opt-text">6 PM – 9 PM (peak party hours 🎉)</div></div>
+      <div class="opt" onclick="select('q8',this,'After 9PM')"><div class="opt-radio"></div><div class="opt-text">After 9 PM (won't use if not available)</div></div>
+    </div>
+  </div>
+  <hr class="q-divider">
+
+  <!-- Q9 -->
+  <div class="q-block" style="animation-delay:0.45s">
+    <div class="q-label">
+      <div class="q-num">9</div>
+      <div>
+        <div class="q-text">What do you drink most?</div>
+      </div>
+    </div>
+    <div class="options-grid" id="q9">
+      <div class="opt" onclick="select('q9',this,'Beer')"><div class="opt-radio"></div><div class="opt-text">🍺 Beer</div></div>
+      <div class="opt" onclick="select('q9',this,'Whisky/Scotch')"><div class="opt-radio"></div><div class="opt-text">🥃 Whisky / Scotch</div></div>
+      <div class="opt" onclick="select('q9',this,'Vodka')"><div class="opt-radio"></div><div class="opt-text">🍸 Vodka</div></div>
+      <div class="opt" onclick="select('q9',this,'Wine')"><div class="opt-radio"></div><div class="opt-text">🍷 Wine</div></div>
+      <div class="opt" onclick="select('q9',this,'Rum/Gin')"><div class="opt-radio"></div><div class="opt-text">🍹 Rum / Gin</div></div>
+      <div class="opt" onclick="select('q9',this,'Mix')"><div class="opt-radio"></div><div class="opt-text">🎲 Mix of everything</div></div>
+    </div>
+  </div>
+  <hr class="q-divider">
+
+  <!-- Q10 -->
+  <div class="q-block" style="animation-delay:0.5s">
+    <div class="q-label">
+      <div class="q-num">10</div>
+      <div>
+        <div class="q-text">Drop your WhatsApp number to get early access</div>
+        <div class="q-sub">Optional — only if you want to be first to know when we launch 🚀</div>
+      </div>
+    </div>
+    <input class="text-input" id="q10" placeholder="98XXXXXXXX (optional)" oninput="updateProgress()">
+  </div>
+
+  <!-- Submit -->
+  <div class="submit-wrap">
+    <button class="submit-btn" id="submitBtn" onclick="submitForm()" disabled>
+      SUBMIT SURVEY <span>→</span>
+    </button>
+    <div class="submit-note">Your response is anonymous. No spam, ever.</div>
+  </div>
+
+</div>
+</div>
+
+<!-- Success screen -->
+<div class="success-screen" id="successScreen">
+  <div class="success-icon">🎉</div>
+  <h2>YOU'RE AWESOME!</h2>
+  <p>Thanks for filling this out. We'll let you know as soon as we launch in your area. Meanwhile, share this with friends — the more responses we get, the faster we launch!</p>
+  <div class="share-btns">
+    <button class="share-btn share-wa" onclick="shareWA()">📱 Share on WhatsApp</button>
+    <button class="share-btn share-copy" onclick="copyLink()">🔗 Copy Link</button>
+  </div>
+</div>
+
+<!-- Response badge -->
+<div class="resp-badge">
+  <div class="resp-dot"></div>
+  <span id="respCount">0</span> responses so far
+</div>
+
+<script>
+  const answers = {};
+  const ageConfirmed = { val: false };
+  let respCount = Math.floor(Math.random() * 30) + 12; // seed with some social proof
+  document.getElementById('respCount').textContent = respCount;
+
+  function toggleAge() {
+    ageConfirmed.val = !ageConfirmed.val;
+    const el = document.getElementById('ageCheck');
+    el.classList.toggle('checked', ageConfirmed.val);
+    updateProgress();
+  }
+
+  function select(qId, el, value) {
+    // deselect all in group
+    document.getElementById(qId).querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    answers[qId] = value;
+    updateProgress();
+  }
+
+  function updateProgress() {
+    // count answered
+    let count = 0;
+    ['q1','q2','q3','q5','q6','q7','q8','q9'].forEach(q => { if(answers[q]) count++; });
+    if (document.getElementById('q4').value.trim()) count++;
+    // q10 is optional, counts as bonus
+
+    const pct = Math.round((count / 9) * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressLabel').textContent = count + ' / 9';
+
+    // enable submit if age confirmed + at least 6 answered
+    const canSubmit = ageConfirmed.val && count >= 6;
+    document.getElementById('submitBtn').disabled = !canSubmit;
+  }
+
+  function submitForm() {
+    // Collect all answers
+    answers['q4_area'] = document.getElementById('q4').value;
+    answers['q10_phone'] = document.getElementById('q10').value;
+    answers['timestamp'] = new Date().toISOString();
+
+    // In production: POST to your backend / Google Apps Script webhook
+    // For now, log to console + show summary
+    console.log('Survey Response:', JSON.stringify(answers, null, 2));
+
+    // Show success
+    document.getElementById('formArea').style.display = 'none';
+    document.getElementById('successScreen').classList.add('show');
+
+    // Update counter
+    respCount++;
+    document.getElementById('respCount').textContent = respCount;
+
+    // Scroll top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function shareWA() {
+    const text = encodeURIComponent("Hey! Quick 2-min survey — would you use alcohol home delivery in Delhi NCR? Fill this out 👇\n" + window.location.href);
+    window.open('https://wa.me/?text=' + text, '_blank');
+  }
+
+  function copyLink() {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      alert('Link copied! Share it on WhatsApp groups 🎉');
+    });
+  }
+</script>
+</body>
+</html>
